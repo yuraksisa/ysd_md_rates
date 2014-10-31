@@ -1,0 +1,6 @@
+require 'yito/model/rates/ysd_md_rates_season_definition'
+require 'yito/model/rates/ysd_md_rates_factor_definition'
+require 'yito/model/rates/ysd_md_rates_price_definition'
+require 'yito/model/rates/ysd_md_rates_season'
+require 'yito/model/rates/ysd_md_rates_factor'
+require 'yito/model/rates/ysd_md_rates_price'

@@ -11,9 +11,11 @@ module Yito
   	  	property :id, Serial
   	  	property :name, String, :length => 80
         property :description, String, :length => 255
-        property :max_price, Decimal, :scale => 2, :precision => 10
-        property :base_price, Decimal, :scale => 2, :precision => 10
+        property :max_price, Decimal, :scale => 2, :precision => 10, :default => 0
+        property :base_price, Decimal, :scale => 2, :precision => 10, :default => 0
         property :type, Enum[:season, :no_season], :default => :no_season
+        property :units_management, Enum[:unitary, :detailed], :default => :unitary
+        property :units_management_value, Integer, :default => 1
     
         belongs_to :factor_definition, :required => false
         belongs_to :season_definition, :required => false
@@ -24,6 +26,31 @@ module Yito
           check_factor_definition! if self.factor_definition
           check_season_definition! if self.season_definition
           super
+        end
+
+        def detailed_prices_basic_units(season=nil)
+           if units_management == :detailed
+             prices.select do |price| 
+                if season 
+                  price.units > 0 and (not price.season.nil? and price.season.id == season.id)
+                else
+                  price.units > 0
+                end
+             end 
+           end 
+        end
+
+        def detailed_prices_extra_unit(season=nil)
+           if units_management = :detailed
+             data = prices.select do |price| 
+                if season 
+                  price.units == 0 and (not price.season.nil? and price.season.id == season.id)
+                else
+                  price.units == 0
+                end
+             end              
+             data.first.price if data.size > 0
+           end
         end
 
         private 

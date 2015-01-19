@@ -32,18 +32,23 @@ module Yito
 
         def self.all_season_ordered(opts={})
           # @See http://rhnh.net/2010/12/01/ordering-by-a-field-in-a-join-model-with-datamapper
-          order_from_month = DataMapper::Query::Direction.new(season.from_month, :asc)
-          order_from_day = DataMapper::Query::Direction.new(season.from_day, :asc)
-          order_to_month = DataMapper::Query::Direction.new(season.to_month, :asc)
-          order_to_day = DataMapper::Query::Direction.new(season.to_day, :asc)
+          if price_definition and price_definition.type == :season
+            order_from_month = DataMapper::Query::Direction.new(season.from_month, :asc)
+            order_from_day = DataMapper::Query::Direction.new(season.from_day, :asc)
+            order_to_month = DataMapper::Query::Direction.new(season.to_month, :asc)
+            order_to_day = DataMapper::Query::Direction.new(season.to_day, :asc)
           
-          query = all.query # Access a blank query object for us to manipulate
-          query.instance_variable_set("@order", [order_from_month, order_from_day, order_to_month, order_to_day])
+            query = all.query # Access a blank query object for us to manipulate
+            query.instance_variable_set("@order", [order_from_month, order_from_day, order_to_month, order_to_day])
 
-          # Force the season model to be joined into the query
-          query.instance_variable_set("@links", [relationships['season'].inverse])
+            # Force the season model to be joined into the query
+            query.instance_variable_set("@links", [relationships['season'].inverse])
 
-          all(query) # && all(opts) # Create a new collection with the modified query
+            all(query) # && all(opts) # Create a new collection with the modified query
+          else
+            query = all.query
+            all(query)
+          end
         end
 
         private 

@@ -16,6 +16,10 @@ module Yito
         property :to_month, Integer
         belongs_to :season_definition
         
+        def to_s
+          "#{from_month.to_s.rjust(2, '0')}/#{from_day.to_s.rjust(2, '0')}-#{to_month.to_s.rjust(2, '0')}/#{to_day.to_s.rjust(2, '0')}"
+        end
+
         def save
           check_season_definition! if self.season_definition
           super

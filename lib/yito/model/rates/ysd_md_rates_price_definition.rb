@@ -41,7 +41,7 @@ module Yito
         end
 
         def detailed_prices_extra_unit(season=nil)
-           if units_management = :detailed
+           if units_management == :detailed
              data = prices.select do |price| 
                 if season 
                   price.units == 0 and (not price.season.nil? and price.season.id == season.id)

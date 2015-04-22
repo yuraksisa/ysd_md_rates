@@ -53,6 +53,22 @@ module Yito
            end
         end
 
+        def detailed_adjust_extra_unit(season=nil)
+           if units_management == :detailed
+             data = prices.select do |price| 
+                if season 
+                  price.units == 0 and (not price.season.nil? and price.season.id == season.id)
+                else
+                  price.units == 0
+                end
+             end              
+             
+             data.size == 0 ? "" : (data.first.adjust_operation == ' ' ? '' : data.first.adjust_operation + " " + ("%.2f" % data.first.adjust_amount))
+
+           end
+        end
+
+
         private 
 
         def check_factor_definition!

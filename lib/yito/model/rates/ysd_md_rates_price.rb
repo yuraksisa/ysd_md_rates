@@ -17,6 +17,18 @@ module Yito
         belongs_to :price_definition, :child_key => [:price_definition_id], :parent_key => [:id]
         belongs_to :season, :required => false
 
+        def apply_adjust(value)
+          if adjust_operation == '*'
+            return value * adjust_amount
+          elsif adjust_operation == '+'
+            return value + adjust_amount
+          elsif adjust_operation == '-'
+            return value - adjust_amount
+          else
+            return value
+          end  
+        end
+
         def save
           check_price_definition! if self.price_definition
           check_season! if self.season

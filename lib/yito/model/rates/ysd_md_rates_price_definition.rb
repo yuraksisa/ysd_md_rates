@@ -156,7 +156,6 @@ module Yito
           price = Price.first(price_definition_id: id, units: 1)
           price_value = price.nil? ? 0 : price.price * units
           price_value = price.nil? ? price_value : price.apply_adjust(price_value)
-          p "price_value: #{price_value}"
           apply_price_definition(price_value, units)
         end
 
@@ -253,14 +252,14 @@ module Yito
           if season = season_definition.season(date)
             if units == 0
               apply_price_definition(0, units)
-            elsif unit <= units_management_value
-              price = Price.first(price_definition_id: id, season_id: season.id, units: unit)
+            elsif units <= units_management_value
+              price = Price.first(price_definition_id: self.id, season_id: season.id, units: unit)
               price_value = price.nil? ? 0 : price.price
               price_value = price.nil? ? price_value : price.apply_adjust(price_value)
               apply_price_definition(price_value, units)
             else
-              price_max = Price.first(price_definition: id, season_id: season.id, units: units_management_value)
-              price_extra = Price.first(price_definition: id, units: 0)
+              price_max = Price.first(price_definition_id: self.id, season_id: season.id, units: units_management_value)
+              price_extra = Price.first(price_definition_id: self.id, season_id: season.id, units: 0)
               price_value = price_max.nil? ? 0 : price_max.price
               price_value += price_extra.nil? ? 0 : (price_extra.price * (units - units_management_value))
               price_value = price.nil? ? price_value : price.apply_adjust(price_value)

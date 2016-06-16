@@ -253,7 +253,7 @@ module Yito
             if units == 0
               apply_price_definition(0, units)
             elsif units <= units_management_value
-              price = Price.first(price_definition_id: self.id, season_id: season.id, units: unit)
+              price = Price.first(price_definition_id: self.id, season_id: season.id, units: units)
               price_value = price.nil? ? 0 : price.price
               price_value = price.nil? ? price_value : price.apply_adjust(price_value)
               apply_price_definition(price_value, units)

@@ -22,7 +22,7 @@ module Yito
             selected_seasons = seasons.select do |season|
               date_from = Date.civil(date.year, season.from_month, season.from_day)
               date_to = Date.civil(date.year, season.to_month, season.to_day)
-              date >= date_from and date <= date_to
+              date.to_date >= date_from and date.to_date <= date_to
             end 
             selected_seasons.first
           end

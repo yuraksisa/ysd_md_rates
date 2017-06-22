@@ -185,7 +185,7 @@ module Yito
         def calculate_price_no_season_detailed(units)
           if units == 0
             apply_price_definition(0, units)
-          elsif unit <= units_management_value
+          elsif units <= units_management_value
             price = Price.first(price_definition_id: id, units: unit)
             price_value = price.nil? ? 0 : price.price
             price_value = price.nil? ? price_value : price.apply_adjust(price_value)            

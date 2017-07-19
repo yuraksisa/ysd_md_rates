@@ -36,7 +36,7 @@ module Yito
         def seasons_days(date, days)
           return nil if date.nil?
 
-          result = self.seasons.inject({}) do |result, season|
+          built_result = self.seasons.inject({}) do |result, season|
             season_days = season.days(date, days)
             if season_days > 0
               result.store(season, season_days)

@@ -360,7 +360,7 @@ module Yito
         #
         def calculate_multiple_prices_season_unitary(date, units, mode)
 
-          unitary_price = calculate_price_season_unitary(date, 1)
+          unitary_price = calculate_price_season_unitary(date, 1, mode)
 
           prices = (1..units).inject({}) do |result, item|
             result.store(item, item * unitary_price)

@@ -59,7 +59,8 @@ module Yito
 
           (date_to >= period_start_date and date_to <= period_end_date) or
           (date_from >= period_start_date and date_from <= period_end_date) or
-          (date_from >= period_start_date and date_to <= period_end_date)
+          (date_from >= period_start_date and date_to <= period_end_date) or
+          (date_from <= period_start_date and date_to >= period_end_date)
 
         end
 

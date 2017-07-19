@@ -104,16 +104,18 @@ module Yito
 
            end
         end
+
+        # ------------ Calculating price --------------------------------
         
         #
         # Calculate the price for a day and a number of units
         #
-        def calculate_price(date, units)
+        def calculate_price(date, units, mode=:first_season_day)
           if type == :season
             if units_management == :unitary
-              calculate_price_season_unitary(date, units)
+              calculate_price_season_unitary(date, units, mode)
             else
-              calculate_price_season_detailed(date, units)
+              calculate_price_season_detailed(date, units, mode)
             end
           else
             if units_management == :unitary
@@ -128,12 +130,14 @@ module Yito
         # Calculate multiple prices for a date and from 1 unit to the
         # number of units
         #
-        def calculate_multiple_prices(date, units)
+        # NOTE: Not full implemented
+        #
+        def calculate_multiple_prices(date, units, mode=:first_season_day)
           if type == :season
             if units_management == :unitary
-              calculate_multiple_prices_season_unitary(date, units)
+              calculate_multiple_prices_season_unitary(date, units, mode)
             else
-              calculate_multiple_prices_season_detailed(date, units)
+              calculate_multiple_prices_season_detailed(date, units, mode)
             end
           else
             if units_management == :unitary
@@ -146,7 +150,7 @@ module Yito
 
         private 
 
-        # ------------ Calculating the price --------------------------------
+        # -------------------------------------------------------------------------------
         
         #
         # Calculate the price when there are not different prices for seasons 
@@ -160,33 +164,14 @@ module Yito
         end
 
         #
-        # Calculate prices up to units where there are not differents prices
-        # for season and the price is unitary
-        #
-        def calculate_multiple_prices_no_season_unitary(units)
-        
-          unitary_price = calculate_price_no_season_unitary(1)
-
-          prices = (1..units).inject({}) do |result, item|
-             result.store(item, item * unitary_price)
-             result
-          end 
-
-          return prices
-
-        end
-        
-        #
         # Calculate the price when there are not different prices for seasons
         # and the price is detailed
-        #
-        # NOT TESTED
         #
         def calculate_price_no_season_detailed(units)
           if units == 0
             apply_price_definition(0, units)
           elsif units <= units_management_value
-            price = Price.first(price_definition_id: id, units: unit)
+            price = Price.first(price_definition_id: id, units: units)
             price_value = price.nil? ? 0 : price.price
             price_value = price.nil? ? price_value : price.apply_adjust(price_value)            
             apply_price_definition(price_value, units)
@@ -199,55 +184,74 @@ module Yito
           end 
         end
 
-        #
-        # Calculate prices up to units where there are not differents prices
-        # for season and the price is unitary
-        #
-        # NOT IMPLEMENTED
-        #
-        def calculate_multiple_prices_no_season_detailed(units)
-
-        end        
+        # ----------------------------------------------------------------------------------------------
 
         #
         # Calculate the price when there are different prices for seasons 
         # and the price is unitary
         # 
-        def calculate_price_season_unitary(date, units)
+        def calculate_price_season_unitary(date, units, mode)
+
+          if mode == :first_season_day
+            calculate_price_season_unitary_first_season_day(date, units)
+          elsif mode == :season_days_average
+            calculate_price_season_unitary_season_days_average(date, units)
+          end
+
+        end
+
+
+        #
+        # Calculate the price when there are not different prices for seasons
+        # and the price is detailed
+        #
+        def calculate_price_season_detailed(date, units, mode)
+
+          if mode == :first_season_day
+            calculate_price_season_detailed_first_season_day(date, units)
+          elsif mode == :season_days_average
+            calculate_price_season_detailed_season_days_average(date, units)
+          end
+
+        end
+
+        #
+        # Calculate price : season unitary [first season day]
+        #
+        def calculate_price_season_unitary_first_season_day(date, units)
+
           if season = season_definition.season(date)
-            price = Price.first(price_definition_id: id, season_id: season.id, units: 1)
-            price_value = price.nil? ? 0 : price.price * units
-            price_value = price.nil? ? price_value : price.apply_adjust(price_value)
-            apply_price_definition(price_value, units)
+            unitary_season_price(season, units)
           else
             apply_price_definition(0, units)
           end
-        end
-
-        #
-        # Calculate prices up to units where there are differents prices
-        # for season and the price is unitary
-        #
-        def calculate_multiple_prices_season_unitary(date, units)
-
-          unitary_price = calculate_price_season_unitary(date, 1)
-          
-          prices = (1..units).inject({}) do |result, item|
-             result.store(item, item * unitary_price)
-             result
-          end 
-        
-          return prices
 
         end
 
         #
-        # Calculate the price when there are not different prices for seasons 
-        # and the price is detailed
-        # 
-        # NOT TESTED
+        # Calculate price : season unitary [season days average]
         #
-        def calculate_price_season_detailed(date, units)
+        def calculate_price_season_unitary_season_days_average(date, units)
+
+          total_price = 0
+
+          if seasons_days = season_definition.seasons_days(date, units)
+            p "seasons_days: #{seasons_days.inspect}"
+            seasons_days.each do |season, days|
+              total_price += unitary_season_price(season, days)
+            end
+          else
+            total_price = apply_price_definition(0, units)
+          end
+
+          return total_price
+
+        end
+
+        #
+        # Calculate price : season detailed [first season day]
+        #
+        def calculate_price_season_detailed_first_season_day(date, units)
 
           if season = season_definition.season(date)
             if units == 0
@@ -263,22 +267,121 @@ module Yito
               price_value = price_max.nil? ? 0 : price_max.price
               price_value += price_extra.nil? ? 0 : (price_extra.price * (units - units_management_value))
               price_value = price.nil? ? price_value : price.apply_adjust(price_value)
-            end 
+            end
           else
             apply_price_definition(0, units)
           end
 
         end
-        
+
+        #
+        # Calculate price : season detailed [seasons days average]
+        #
+        def calculate_price_season_detailed_season_days_average(date, units)
+
+          total_price = 0
+
+          seasons_days = season_definition.seasons_days(date, units)
+          p "seasons_days: #{seasons_days.inspect}"
+          seasons_days.each do |season, days|
+            season_price = (detailed_season_price(season, units) / units * days)
+            p "season #{season.name} #{"%.2f" % season_price}"
+            total_price += season_price
+          end
+          
+          return total_price
+
+        end
+
+        #
+        # Helper method
+        #
+        def unitary_season_price(season, units)
+          price = Price.first(price_definition_id: id, season_id: season.id, units: 1)
+          price_value = price.nil? ? 0 : price.price * units
+          price_value = price.nil? ? price_value : price.apply_adjust(price_value)
+          apply_price_definition(price_value, units)
+        end
+
+        #
+        # Helper method
+        #
+        def detailed_season_price(season, units)
+
+          if units == 0
+            apply_price_definition(0, units)
+          elsif units <= units_management_value
+            price = Price.first(price_definition_id: self.id, season_id: season.id, units: units)
+            price_value = price.nil? ? 0 : price.price
+            price_value = price.nil? ? price_value : price.apply_adjust(price_value)
+            apply_price_definition(price_value, units)
+          else
+            price_max = Price.first(price_definition_id: self.id, season_id: season.id, units: units_management_value)
+            price_extra = Price.first(price_definition_id: self.id, season_id: season.id, units: 0)
+            price_value = price_max.nil? ? 0 : price_max.price
+            price_value += price_extra.nil? ? 0 : (price_extra.price * (units - units_management_value))
+            price_value = price.nil? ? price_value : price.apply_adjust(price_value)
+          end
+
+        end
+
+        # ---------------- Calculating multiple prices ---------------------------------
+
+        #
+        # Calculate prices up to units where there are not differents prices
+        # for season and the price is unitary
+        #
+        def calculate_multiple_prices_no_season_unitary(units)
+
+          unitary_price = calculate_price_no_season_unitary(1)
+
+          prices = (1..units).inject({}) do |result, item|
+            result.store(item, item * unitary_price)
+            result
+          end
+
+          return prices
+
+        end
+
+        #
+        # Calculate prices up to units where there are not differents prices
+        # for season and the price is unitary
+        #
+        # NOT IMPLEMENTED
+        #
+        def calculate_multiple_prices_no_season_detailed(units)
+
+        end
+
+        #
+        # Calculate prices up to units where there are differents prices
+        # for season and the price is unitary
+        #
+        def calculate_multiple_prices_season_unitary(date, units, mode)
+
+          unitary_price = calculate_price_season_unitary(date, 1)
+
+          prices = (1..units).inject({}) do |result, item|
+            result.store(item, item * unitary_price)
+            result
+          end
+
+          return prices
+
+        end
+
         #
         # Calculate prices up to units where there are not differents prices
         # for season and the price is detailed
         #
         # NOT IMPLEMENTED
         #
-        def calculate_multiple_prices_season_detailed(date, units)
+        def calculate_multiple_prices_season_detailed(date, units, mode)
 
         end
+
+        # ----------------------------------------------------------------------
 
         #
         # Apply the factor and the max price 

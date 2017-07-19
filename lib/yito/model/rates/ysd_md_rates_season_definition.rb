@@ -28,6 +28,24 @@ module Yito
           end
         end
 
+        #
+        # Get the season days
+        #
+        # @return [Hash] where the key is the season and the value the number of days in this season
+        #
+        def seasons_days(date, days)
+          return nil if date.nil?
+
+          result = self.seasons.inject({}) do |result, season|
+            season_days = season.days(date, days)
+            if season_days > 0
+              result.store(season, season_days)
+            end
+            result
+          end
+
+        end
+        
       end
     end
   end

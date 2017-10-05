@@ -43,6 +43,8 @@ module Yito
             end
             result
           end
+          
+          return built_result
 
         end
         

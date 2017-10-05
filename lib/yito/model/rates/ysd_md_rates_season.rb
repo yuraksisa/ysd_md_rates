@@ -37,6 +37,12 @@ module Yito
 
           season_from_date = Date.civil(from_year, from_month, from_day)
           season_to_date = Date.civil(to_year, to_month, to_day)
+
+          # It should be considered in the next year from the date_from
+          if season_to_date < date_from 
+            season_from_date = Date.civil(from_year+1, from_month, from_day)
+            season_to_date = Date.civil(from_year+1, to_month, to_day)
+          end
           
           result = 0
 

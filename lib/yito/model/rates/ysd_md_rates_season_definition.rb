@@ -15,6 +15,19 @@ module Yito
         has n, :seasons, :child_key => [:season_definition_id], :parent_key => [:id], :constraint => :destroy
         
         #
+        # Make a copy of a season ready to be stored
+        # 
+        def make_copy
+          attributes = self.attributes.select {|k,y| k != :id}
+          seasons_attributes = self.seasons.map { |season| season.attributes.select {|k,v| k != :id} }
+          sd = SeasonDefinition.new(attributes)
+          seasons_attributes.each do |season_attributes|
+            sd.seasons << Season.new(season_attributes)
+          end
+          return sd
+        end
+        
+        #
         # Get the season from a date
         #
         def season(date)

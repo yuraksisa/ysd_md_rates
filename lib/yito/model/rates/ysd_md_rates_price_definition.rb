@@ -176,8 +176,8 @@ module Yito
             price_value = price.nil? ? price_value : price.apply_adjust(price_value)            
             apply_price_definition(price_value, units)
           else
-            price_max = Price.first(price_definition: id, units: units_management_value)
-            price_extra = Price.first(price_definition: id, units: 0)
+            price_max = Price.first(price_definition_id: id, units: units_management_value)
+            price_extra = Price.first(price_definition_id: id, units: 0)
             price_value = price_max.nil? ? 0 : price_max.price
             price_value += price_extra.nil? ? 0 : (price_extra.price * (units - units_management_value))
             price_value = price.nil? ? price_value : price.apply_adjust(price_value)
@@ -348,9 +348,15 @@ module Yito
         # Calculate prices up to units where there are not differents prices
         # for season and the price is unitary
         #
-        # NOT IMPLEMENTED
         #
         def calculate_multiple_prices_no_season_detailed(units)
+
+          prices = (1..units).inject({}) do |result, item|
+            result.store(item, calculate_price_no_season_detailed(item))
+            result
+          end
+
+          return prices
 
         end
 
@@ -378,6 +384,13 @@ module Yito
         # NOT IMPLEMENTED
         #
         def calculate_multiple_prices_season_detailed(date, units, mode)
+
+          prices = (1..units).inject({}) do |result, item|
+            result.store(item, calculate_price_season_detailed(date, item, mode))
+            result
+          end
+
+          return prices
 
         end
 

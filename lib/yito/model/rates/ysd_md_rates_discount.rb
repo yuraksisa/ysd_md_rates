@@ -14,6 +14,8 @@ module Yito
         property :id, Serial
         property :date_from, DateTime
         property :date_to, DateTime
+        property :source_date_from, DateTime
+        property :source_date_to, DateTime
         property :discount_type, Enum[:percentage, :amount], :default => :percentage      
         property :value, Decimal, :scale => 2, :precision => 10, :default => 0
         

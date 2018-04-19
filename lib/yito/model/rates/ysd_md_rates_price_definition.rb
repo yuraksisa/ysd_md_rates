@@ -298,7 +298,7 @@ module Yito
         #
         def unitary_season_price(season, units)
           price = Price.first(price_definition_id: id, season_id: season.id, units: 1)
-          price_value = price.nil? ? 0 : price.price * units
+          price_value = (price.nil? or price.price.nil?) ? 0 : price.price * units
           price_value = price.nil? ? price_value : price.apply_adjust(price_value)
           apply_price_definition(price_value, units)
         end

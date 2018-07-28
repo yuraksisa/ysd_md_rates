@@ -11,6 +11,7 @@ module Yito
   	  	property :id, Serial
   	  	property :name, String, :length => 80
         property :description, String, :length => 255
+        property :standard_price, Decimal, :scale => 2, :precision => 10, :default => 0
         property :max_price, Decimal, :scale => 2, :precision => 10, :default => 0
         property :base_price, Decimal, :scale => 2, :precision => 10, :default => 0
         property :type, Enum[:season, :no_season], :default => :no_season

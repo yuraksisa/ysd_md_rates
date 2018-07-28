@@ -1,0 +1,17 @@
+seasons_validation:
+  no_seasons_defined: No se han definido temporadas  
+  first_season_start: La temporada %1 ha de empezar el 1 de Enero
+  last_season_end: La temporada %1 ha de terminar el 31 de Diciembre
+  end_date: La temporada %1 ha de terminar el %2 de %3
+  month_1: Enero 
+  month_2: Febrero
+  month_3: Marzo
+  month_4: Abril
+  month_5: Mayo
+  month_6: Junio
+  month_7: Julio
+  month_8: Agosto
+  month_9: Septiembre
+  month_10: Octubre
+  month_11: Noviembre
+  month_12: Diciembre  

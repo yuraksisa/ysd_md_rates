@@ -254,7 +254,7 @@ module Yito
         #
         def calculate_price_season_detailed_first_season_day(date, units)
 
-          if season = season_definition.season(date)
+          if season_definition and season = season_definition.season(date)
             if units == 0
               apply_price_definition(0, units)
             elsif units <= units_management_value

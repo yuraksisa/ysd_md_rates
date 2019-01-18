@@ -290,6 +290,7 @@ module Yito
               price_value = price_max.nil? ? 0 : price_max.price
               price_value += price_extra.nil? ? 0 : (price_extra.price * (units - units_management_value))
               price_value = price.nil? ? price_value : price.apply_adjust(price_value)
+              apply_price_definition(price_value, units)
             end
           else
             apply_price_definition(0, units)

@@ -11,13 +11,36 @@ module Yito
   	  	property :id, Serial
   	  	property :name, String, :length => 80
         property :description, String, :length => 255
+
+        # Standard price (not used)
         property :standard_price, Decimal, :scale => 2, :precision => 10, :default => 0
-        property :max_price, Decimal, :scale => 2, :precision => 10, :default => 0
+        # Base price: It's always added to the rate
         property :base_price, Decimal, :scale => 2, :precision => 10, :default => 0
+        # Max price : If the calculated price is higher that it, it's adjusted to this value
+        property :max_price, Decimal, :scale => 2, :precision => 10, :default => 0
+
+        # Specific prices for season or not
         property :type, Enum[:season, :no_season], :default => :no_season
+        
+        # Prices are measured in days and/or hours
+        property :time_measurement_days, Boolean, default: true
+        property :time_measurement_hours, Boolean, default: false
+
+        # Units : 1 unit or a set of units (1-2-3-4-5-6-7 days)
         property :units_management, Enum[:unitary, :detailed], :default => :unitary
         property :units_management_value, Integer, :default => 1
-    
+        property :units_management_value_hours_list, String, length: 200, default: '1' # comma-separated values
+        property :units_management_value_hours_half_day, Integer, default: 4
+
+        # Daily usage extra cost (for transport products)
+        # Less than <daily_usage_units_days> days
+        # More than <daily_usage_units_limit> kms/miles
+        # Will pay <daily_usage_units_usage_units_price> for km/mile
+        property :daily_usage_units_days, Integer, default: 0
+        property :daily_usage_units_limit, Integer, default: 0
+        property :daily_usage_units_usage_units_price, Decimal, scale: 2, precision: 10, default: 0
+  
+
         belongs_to :factor_definition, :required => false
         belongs_to :season_definition, :required => false
 
@@ -283,10 +306,10 @@ module Yito
           total_price = 0
 
           seasons_days = season_definition.seasons_days(date, units)
-          p "seasons_days: #{seasons_days.inspect}"
+          #p "seasons_days: #{seasons_days.inspect}"
           seasons_days.each do |season, days|
             season_price = (detailed_season_price(season, units) / units * days)
-            p "season #{season.name} #{"%.2f" % season_price}"
+            #p "season #{season.name} #{"%.2f" % season_price}"
             total_price += season_price
           end
           

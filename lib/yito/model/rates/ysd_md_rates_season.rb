@@ -14,6 +14,9 @@ module Yito
         property :from_month, Integer
         property :to_day, Integer
         property :to_month, Integer
+        property :min_days, Integer, default: 1
+        property :apply_discount_by_days, Boolean, default: true
+
         belongs_to :season_definition
         
         def to_s

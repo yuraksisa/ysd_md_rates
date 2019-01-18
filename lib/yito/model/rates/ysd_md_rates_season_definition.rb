@@ -12,7 +12,8 @@ module Yito
   	  	property :name, String, :length => 80
   	  	property :description, String, :length => 255
 
-        has n, :seasons, :child_key => [:season_definition_id], :parent_key => [:id], :constraint => :destroy
+        has n, :seasons, :child_key => [:season_definition_id], :parent_key => [:id], 
+               :constraint => :destroy, :order => [:from_month, :from_day]
         
         #
         # Make a copy of a season ready to be stored

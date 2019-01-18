@@ -1,11 +1,13 @@
 require 'yito/model/rates/ysd_md_rates_season_definition'
 require 'yito/model/rates/ysd_md_rates_factor_definition'
 require 'yito/model/rates/ysd_md_rates_price_definition'
+require 'yito/model/rates/ysd_md_rates_discount_by_day_definition'
 require 'yito/model/rates/ysd_md_rates_season'
 require 'yito/model/rates/ysd_md_rates_factor'
 require 'yito/model/rates/ysd_md_rates_price'
 require 'yito/model/rates/ysd_md_rates_promotion_code'
 require 'yito/model/rates/ysd_md_rates_discount'
+require 'yito/model/rates/ysd_md_rates_discount_by_day'
 
 module Yito
   module Model

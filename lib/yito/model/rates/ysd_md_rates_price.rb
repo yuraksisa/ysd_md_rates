@@ -13,7 +13,8 @@ module Yito
         property :units, Integer
         property :adjust_operation, String, :length => 1, :format => /[*+-\/]|\s/, :default => ' '
         property :adjust_amount, Decimal, :scale => 2, :precision => 10
-        
+        property :time_measurement, Enum[:days, :hours], :default => :days
+                
         belongs_to :price_definition, :child_key => [:price_definition_id], :parent_key => [:id]
         belongs_to :season, :required => false
 

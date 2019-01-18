@@ -154,8 +154,6 @@ module Yito
         # Calculate multiple prices for a date and from 1 unit to the
         # number of units
         #
-        # NOTE: Not full implemented
-        #
         def calculate_multiple_prices(date, units, mode=:first_season_day)
           if type == :season
             if units_management == :unitary
@@ -174,7 +172,7 @@ module Yito
 
         private 
 
-        # -------------------------------------------------------------------------------
+        # -------------- PRIVATE METHODS ----------------------------------------------
         
         #
         # Calculate the price when there are not different prices for seasons 
@@ -205,6 +203,7 @@ module Yito
             price_value = price_max.nil? ? 0 : price_max.price
             price_value += price_extra.nil? ? 0 : (price_extra.price * (units - units_management_value))
             price_value = price.nil? ? price_value : price.apply_adjust(price_value)
+            apply_price_definition(price_value, units)
           end 
         end
 
@@ -260,7 +259,7 @@ module Yito
           total_price = 0
 
           if seasons_days = season_definition.seasons_days(date, units)
-            p "seasons_days: #{seasons_days.inspect}"
+            #p "seasons_days: #{seasons_days.inspect}"
             seasons_days.each do |season, days|
               total_price += unitary_season_price(season, days)
             end
@@ -345,6 +344,7 @@ module Yito
             price_value = price_max.nil? ? 0 : price_max.price
             price_value += price_extra.nil? ? 0 : (price_extra.price * (units - units_management_value))
             price_value = price.nil? ? price_value : price.apply_adjust(price_value)
+            apply_price_definition(price_value, units)
           end
 
         end
@@ -422,6 +422,11 @@ module Yito
 
         #
         # Apply the factor and the max price 
+        #
+        # == Parameters
+        #
+        # price:: The "calculated" price
+        # units:: Number of units (days)
         #
         def apply_price_definition(price, units)
           # Apply factor

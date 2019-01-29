@@ -15,6 +15,9 @@ module Yito
         has n, :seasons, :child_key => [:season_definition_id], :parent_key => [:id], 
                :constraint => :destroy, :order => [:from_month, :from_day]
         
+        property :apply_min_days, Boolean, default: false
+        property :apply_discount_by_days, Boolean, default: false
+
         #
         # Make a copy of a season ready to be stored
         # 
@@ -28,6 +31,22 @@ module Yito
           return sd
         end
         
+        #
+        # Calculate the min days
+        #
+        # == Parameters::
+        #
+        # date:: the date from
+        # days:: the number of days
+        #
+        # == Return::
+        # 
+        # The minimum number of days
+        #
+        def min_days(date, days)
+          cat_min_days = (seasons_days(date, days).inject([]) {|result, season| result << season.first.min_days; result}).max
+        end
+
         #
         # Get the season from a date
         #

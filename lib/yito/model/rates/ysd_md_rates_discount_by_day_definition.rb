@@ -28,9 +28,20 @@ module Yito
           return dbd_def
         end
 
-        # Get the factor for a number of days        
+        #
+        # Get the factor for a number of days
+        #
+        # == Parameters::
+        #
+        # days:: The number of days
+        # 
+        # == Returns::
+        #
+        # The discount to apply
+        #
+        #        
         def discount(days)
-          discount_by_day_item = DiscountByDay.first(conditions: {:from_days.lte => days},
+          discount_by_day_item = DiscountByDay.first(conditions: {:from_days.lt => days},
                                                      order: [:from_days.desc],
                                                      limit: 1)
           discount_by_day_item.nil? ? 0 : discount_by_day_item.discount
